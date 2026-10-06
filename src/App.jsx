@@ -7,7 +7,8 @@ import receptionFrontdesk from './assets/reception-frontdesk.png'
 import lobbyPanorama from './assets/lobby-panorama.png'
 import brandSign from './assets/brand-sign.png'
 import diningDetail from './assets/dining-detail.png'
-import { MotionConfig, motion } from 'framer-motion'
+import { AnimatePresence, MotionConfig, motion } from 'framer-motion'
+import { useState } from 'react'
 import {
   ArrowRight,
   BedDouble,
@@ -17,6 +18,7 @@ import {
   Facebook,
   Flower2,
   Instagram,
+  Menu,
   MapPin,
   MessageCircle,
   ShieldCheck,
@@ -25,6 +27,7 @@ import {
   Trees,
   UtensilsCrossed,
   Waves,
+  X,
 } from 'lucide-react'
 
 const navItems = [
@@ -108,6 +111,8 @@ const fadeUp = {
 }
 
 function App() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
   return (
     <MotionConfig reducedMotion="user">
     <motion.div
@@ -134,7 +139,7 @@ function App() {
             initial={{ opacity: 0, y: -18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease: 'easeOut' }}
-            className="flex items-center justify-between rounded-full border border-white/70 bg-[#f8f5ee]/95 px-4 py-3 shadow-[0_18px_50px_rgba(23,31,23,0.2)] backdrop-blur-xl sm:px-6"
+            className="relative flex items-center justify-between rounded-full border border-white/70 bg-[#f8f5ee]/95 px-3 py-3 shadow-[0_18px_50px_rgba(23,31,23,0.2)] backdrop-blur-xl sm:px-6"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#65765b]/40 bg-[#65765b]/10 text-xs font-semibold tracking-[0.28em] text-[#53644a]">
@@ -146,7 +151,7 @@ function App() {
               </div>
             </div>
 
-            <div className="hidden items-center gap-3 text-[0.68rem] font-medium text-[#45483f] lg:flex xl:gap-4 xl:text-xs">
+            <div className="hidden items-center gap-2 text-xs font-medium text-[#45483f] lg:flex xl:gap-4">
               {navItems.map((item) => (
                 <a key={item.label} href={item.href} className="whitespace-nowrap transition hover:text-[#65765b]">
                   {item.label}
@@ -154,9 +159,53 @@ function App() {
               ))}
             </div>
 
-            <a href={`tel:${hotelDetails.phone.replace(/\s+/g, '')}`} className="hidden rounded-full bg-[#65765b] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#53644a] sm:inline-flex">
-              Book Your Stay
-            </a>
+            <div className="flex items-center gap-2">
+              <a href={`tel:${hotelDetails.phone.replace(/\s+/g, '')}`} className="hidden rounded-full bg-[#65765b] px-3 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#53644a] sm:inline-flex sm:px-4 sm:text-sm">
+                Book Your Stay
+              </a>
+              <button
+                type="button"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#65765b]/30 text-[#485541] transition hover:bg-[#65765b]/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#65765b] lg:hidden"
+                aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-navigation"
+                onClick={() => setMobileMenuOpen((open) => !open)}
+              >
+                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            </div>
+
+            <AnimatePresence>
+              {mobileMenuOpen && (
+                <motion.div
+                  id="mobile-navigation"
+                  initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                  transition={{ duration: 0.18, ease: 'easeOut' }}
+                  className="absolute left-0 right-0 top-[calc(100%+0.65rem)] z-50 rounded-2xl border border-[#d7d1c4] bg-[#f8f5ee] p-3 shadow-[0_18px_50px_rgba(23,31,23,0.2)] lg:hidden"
+                >
+                  <div className="grid grid-cols-2 gap-1">
+                    {navItems.map((item) => (
+                      <a
+                        key={item.label}
+                        href={item.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="rounded-xl px-3 py-3 text-sm font-medium text-[#45483f] transition hover:bg-[#65765b]/10 hover:text-[#53644a] focus-visible:outline-2 focus-visible:outline-[#65765b]"
+                      >
+                        {item.label}
+                      </a>
+                    ))}
+                  </div>
+                  <a
+                    href={`tel:${hotelDetails.phone.replace(/\s+/g, '')}`}
+                    className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#65765b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#53644a]"
+                  >
+                    <ConciergeBell size={16} /> Book Your Stay
+                  </a>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.nav>
 
           <motion.section
@@ -166,7 +215,7 @@ function App() {
               hidden: {},
               show: { transition: { staggerChildren: 0.14 } },
             }}
-            className="grid min-h-[calc(100vh-8rem)] items-end pb-10 pt-20 md:pt-24"
+            className="grid min-h-[calc(100svh-6rem)] items-end pb-10 pt-20 md:min-h-[calc(100vh-8rem)] md:pt-24"
           >
             <div className="max-w-3xl">
               <motion.p
@@ -302,7 +351,7 @@ function App() {
                 transition={{ duration: 0.55, delay: index * 0.08 }}
                 className="group overflow-hidden border border-[#d7d1c4] bg-white"
               >
-                <div className="relative h-[28rem] overflow-hidden">
+                <div className="relative h-[23rem] overflow-hidden sm:h-[28rem]">
                   <img src={room.image} alt={room.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0d1115] via-[#0d1115]/15 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-5">
@@ -329,7 +378,7 @@ function App() {
               <img
                 src={roomLounge}
                 alt="Hotel lounge"
-                className="h-full min-h-[30rem] w-full object-cover"
+                className="h-full min-h-[22rem] w-full object-cover sm:min-h-[30rem]"
               />
             </div>
 
@@ -431,7 +480,7 @@ function App() {
                 transition={{ duration: 0.55, delay: index * 0.08 }}
                 className={`overflow-hidden border border-[#d7d1c4] ${index === 1 ? 'md:translate-y-10' : ''}`}
               >
-                <img src={image} alt="MKR Grand atmosphere" className="h-[24rem] w-full object-cover transition duration-700 hover:scale-105" />
+                <img src={image} alt="MKR Grand atmosphere" className="h-[19rem] w-full object-cover transition duration-700 hover:scale-105 sm:h-[24rem]" />
               </motion.div>
             ))}
           </div>
